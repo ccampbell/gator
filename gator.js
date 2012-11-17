@@ -151,6 +151,12 @@
      * @returns {null|Element}
      */
     function _matches(element, selector, bound_element) {
+
+        // no selector means this event was bound directly to this element
+        if (!selector) {
+            return element;
+        }
+
         // if we have moved up to the element you bound the event to
         // then we have come too far
         if (element === bound_element) {
@@ -228,6 +234,11 @@
     function _bind(events, selector, callback, off) {
         if (!(events instanceof Array)) {
             events = [events];
+        }
+
+        if (!callback) {
+            callback = selector;
+            selector = null;
         }
 
         for (var i = 0; i < events.length; i++) {
