@@ -53,7 +53,7 @@
         }
 
         // internet explorer does not support event capturing
-        // but does have fallback events to use
+        // but does have fallback events to use that will bubble
         if (type == 'focus') {
             type = 'focusin';
         }
@@ -248,10 +248,25 @@
         return this;
     }
 
+    /**
+     * adds an event
+     *
+     * @param {string|Array} events
+     * @param {string} selector
+     * @param {Function} callback
+     * @returns {Object}
+     */
     Gator.prototype.on = function(events, selector, callback) {
         return _bind.call(this, events, selector, callback);
     };
 
+    /**
+     * removes an event
+     *
+     * @param {string|Array} events
+     * @param {string} selector
+     * @returns {Object}
+     */
     Gator.prototype.off = function(events, selector, callback) {
         return _bind.call(this, events, selector, callback, true);
     };

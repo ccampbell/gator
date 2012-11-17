@@ -176,10 +176,25 @@
         return this;
     }
 
+    /**
+     * adds an event
+     *
+     * @param {string|Array} events
+     * @param {string} selector
+     * @param {Function} callback
+     * @returns {Object}
+     */
     Gator.prototype.on = function(events, selector, callback) {
         return _bind.call(this, events, selector, callback);
     };
 
+    /**
+     * removes an event
+     *
+     * @param {string|Array} events
+     * @param {string} selector
+     * @returns {Object}
+     */
     Gator.prototype.off = function(events, selector, callback) {
         return _bind.call(this, events, selector, callback, true);
     };
