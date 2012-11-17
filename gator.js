@@ -37,8 +37,8 @@
     /**
      * cross browser add or event method
      *
-     * @param {Boolean} remove
-     * @param {Element|HTMLDocument} element
+     * @param {boolean} remove
+     * @param {Node|HTMLDocument} element
      * @param {string} type
      * @param {Function} callback
      * @returns void
@@ -88,7 +88,7 @@
      * for simple selector matching of ids, class names, or tag names
      *
      * @param {string} selector
-     * @returns {Boolean}
+     * @returns {boolean}
      */
     function _matchesSelector(selector) {
 
@@ -145,10 +145,10 @@
     /**
      * determines if the specified element matches a given selector
      *
-     * @param {Element} element - the element to compare against the selector
+     * @param {Node} element - the element to compare against the selector
      * @param {string} selector
-     * @param {Element} bound_element - the element the listener was attached to
-     * @returns {null|Element}
+     * @param {Node} bound_element - the element the listener was attached to
+     * @returns {void|Node}
      */
     function _matches(element, selector, bound_element) {
 
@@ -182,7 +182,7 @@
      * gets the event handler for a specific binding
      *
      * @param {Function} callback
-     * @param {Element|HTMLDocument}
+     * @param {Node|HTMLDocument} element
      * @param {string} event
      * @param {string} selector
      * @returns {Function}

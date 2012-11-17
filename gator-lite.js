@@ -75,10 +75,10 @@
     /**
      * determines if the specified element matches a given selector
      *
-     * @param {Element} element - the element to compare against the selector
+     * @param {Node} element - the element to compare against the selector
      * @param {string} selector
-     * @param {Element} bound_element - the element the listener was attached to
-     * @returns {null|Element}
+     * @param {Node} bound_element - the element the listener was attached to
+     * @returns {null|Node}
      */
     function _matches(element, selector, bound_element) {
 
@@ -112,7 +112,7 @@
      * gets the event handler for a specific binding
      *
      * @param {Function} callback
-     * @param {Element|HTMLDocument}
+     * @param {Node|HTMLDocument}
      * @param {string} event
      * @param {string} selector
      * @returns {Function}
