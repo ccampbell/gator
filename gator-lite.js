@@ -31,10 +31,7 @@
  *                           '-._____.-'
  */
 (function() {
-    var Gator = function(element) {
-            this.element = element;
-        },
-        _matcher,
+    var _matcher,
         _handlers = {},
         _instances = {},
         _element_list = [];
@@ -182,6 +179,27 @@
     }
 
     /**
+     * Gator object constructor
+     *
+     * @param {Node} element
+     */
+    function Gator(element) {
+
+        // called as function
+        if (!(this instanceof Gator)) {
+            var key = _keyForElement(element);
+
+            if (!_instances[key]) {
+                _instances[key] = new Gator(element);
+            }
+
+            return _instances[key];
+        }
+
+        this.element = element;
+    }
+
+    /**
      * adds an event
      *
      * @param {string|Array} events
@@ -204,13 +222,5 @@
         return _bind.call(this, events, selector, callback, true);
     };
 
-    window.Gator = function(element) {
-        var key = _keyForElement(element);
-
-        if (!_instances[key]) {
-            _instances[key] = new Gator(element);
-        }
-
-        return _instances[key];
-    };
+    window.Gator = Gator;
 }) ();

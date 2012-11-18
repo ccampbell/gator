@@ -27,10 +27,7 @@
  *                           '-._____.-'
  */
 (function() {
-    var Gator = function(element) {
-            this.element = element;
-        },
-        _matcher,
+    var _matcher,
         _handlers = {},
         _instances = {},
         _element_list = [];
@@ -137,7 +134,7 @@
         // if it doesn't match a native browser method
         // fall back to the gator function
         if (!_matcher) {
-            _matcher = _matchesSelector;
+            _matcher = Gator.matchesSelector;
         }
 
         return _matcher;
@@ -253,6 +250,29 @@
     }
 
     /**
+     * Gator object constructor
+     *
+     * @param {Node} element
+     */
+    function Gator(element) {
+
+        // called as function
+        if (!(this instanceof Gator)) {
+            var key = _keyForElement(element);
+
+            if (!_instances[key]) {
+                _instances[key] = new Gator(element);
+            }
+
+            return _instances[key];
+        }
+
+        this.element = element;
+    }
+
+    Gator.matchesSelector = _matchesSelector;
+
+    /**
      * adds an event
      *
      * @param {string|Array} events
@@ -275,13 +295,5 @@
         return _bind.call(this, events, selector, callback, true);
     };
 
-    window.Gator = function(element) {
-        var key = _keyForElement(element);
-
-        if (!_instances[key]) {
-            _instances[key] = new Gator(element);
-        }
-
-        return _instances[key];
-    };
+    window.Gator = Gator;
 }) ();
