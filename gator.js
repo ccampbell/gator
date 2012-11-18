@@ -46,7 +46,8 @@
 
             // blur and focus do not bubble up but if you use event capturing
             // then you will get them
-            element[remove ? 'removeEventListener' : 'addEventListener'](type, callback, type == 'blur' || type == 'focus');
+            var use_capture = type == 'blur' || type == 'focus';
+            element[remove ? 'removeEventListener' : 'addEventListener'](type, callback, use_capture);
             return;
         }
 
@@ -70,7 +71,7 @@
      * @returns void
      */
     function _cancel(e) {
-       if (e.preventDefault) {
+        if (e.preventDefault) {
             e.preventDefault();
         }
 
@@ -78,6 +79,7 @@
             e.stopPropagation();
         }
 
+        // for IE
         e.returnValue = false;
         e.cancelBubble = true;
     }
@@ -176,6 +178,12 @@
         }
     }
 
+    /**
+     * finds index of element in array
+     *
+     * @param {Node} element
+     * @returns {number}
+     */
     function _keyForElement(element) {
         var i = _element_list.length,
             index = false;
@@ -260,6 +268,11 @@
         if (!(this instanceof Gator)) {
             var key = _keyForElement(element);
 
+            // only keep one Gator instance per node to make sure that
+            // we don't create a ton of new objects if you want to delegate
+            // multiple events from the same node
+            //
+            // for example: Gator(document).on(...
             if (!_instances[key]) {
                 _instances[key] = new Gator(element);
             }

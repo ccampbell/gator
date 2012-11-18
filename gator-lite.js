@@ -106,6 +106,12 @@
         }
     }
 
+    /**
+     * finds index of element in array
+     *
+     * @param {Node} element
+     * @returns {number}
+     */
     function _keyForElement(element) {
         var index = _element_list.indexOf(element);
 
@@ -128,7 +134,7 @@
      */
     function _handlerForCallback(callback, element, event, selector) {
 
-        key = _keyForElement(element) + event + selector;
+        var key = _keyForElement(element) + event + selector;
 
         if (_handlers[key]) {
             return _handlers[key];
@@ -168,11 +174,12 @@
 
         var element = this.element;
 
-        events.forEach(function (event) {
+        events.forEach(function(event) {
 
             // blur and focus do not bubble up but if you use event capturing
             // then you will get them
-            element[remove ? 'removeEventListener' : 'addEventListener'](event, _handlerForCallback(callback, element, event, selector), event == 'blur' || event == 'focus');
+            var use_capture = event == 'blur' || event == 'focus';
+            element[remove ? 'removeEventListener' : 'addEventListener'](event, _handlerForCallback(callback, element, event, selector), use_capture);
         });
 
         return this;
@@ -189,6 +196,11 @@
         if (!(this instanceof Gator)) {
             var key = _keyForElement(element);
 
+            // only keep one Gator instance per node to make sure that
+            // we don't create a ton of new objects if you want to delegate
+            // multiple events from the same node
+            //
+            // for example: Gator(document).on(...
             if (!_instances[key]) {
                 _instances[key] = new Gator(element);
             }
