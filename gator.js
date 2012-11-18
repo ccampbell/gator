@@ -240,7 +240,7 @@
             events = [events];
         }
 
-        if (!callback) {
+        if (!off && !callback) {
             callback = selector;
             selector = null;
         }
