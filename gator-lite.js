@@ -156,15 +156,15 @@
      * @param {string|Array} events
      * @param {string} selector
      * @param {Function} callback
-     * @param {boolean=} off
+     * @param {boolean=} remove
      * @returns {Object}
      */
-    function _bind(events, selector, callback, off) {
+    function _bind(events, selector, callback, remove) {
         if (!(events instanceof Array)) {
             events = [events];
         }
 
-        if (!off && !callback) {
+        if (!remove && !callback) {
             callback = selector;
             selector = null;
         }
@@ -175,7 +175,7 @@
 
             // blur and focus do not bubble up but if you use event capturing
             // then you will get them
-            element[off ? 'removeEventListener' : 'addEventListener'](event, _handlerForCallback(callback, element, event, selector), event == 'blur' || event == 'focus');
+            element[remove ? 'removeEventListener' : 'addEventListener'](event, _handlerForCallback(callback, element, event, selector), event == 'blur' || event == 'focus');
         });
 
         return this;

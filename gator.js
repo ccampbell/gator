@@ -235,18 +235,18 @@
      * @param {boolean=} off
      * @returns {Object}
      */
-    function _bind(events, selector, callback, off) {
+    function _bind(events, selector, callback, remove) {
         if (!(events instanceof Array)) {
             events = [events];
         }
 
-        if (!off && !callback) {
+        if (!remove && !callback) {
             callback = selector;
             selector = null;
         }
 
         for (var i = 0; i < events.length; i++) {
-            _event(off, this.element, events[i], _handlerForCallback(callback, this.element, events[i], selector));
+            _event(remove, this.element, events[i], _handlerForCallback(callback, this.element, events[i], selector));
         }
 
         return this;
