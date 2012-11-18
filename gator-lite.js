@@ -34,10 +34,10 @@
     var Gator = function(element) {
             this.element = element;
         },
-        matcher,
-        handlers = {},
-        instances = {},
-        element_list = [];
+        _matcher,
+        _handlers = {},
+        _instances = {},
+        _element_list = [];
 
     /**
      * returns function to use for determining if an element
@@ -46,31 +46,31 @@
      * @returns {Function}
      */
     function _getMatcher(element) {
-        if (matcher) {
-            return matcher;
+        if (_matcher) {
+            return _matcher;
         }
 
         if (element.matches) {
-            matcher = element.matches;
+            _matcher = element.matches;
         }
 
         if (element.webkitMatchesSelector) {
-            matcher = element.webkitMatchesSelector;
+            _matcher = element.webkitMatchesSelector;
         }
 
         if (element.mozMatchesSelector) {
-            matcher = element.mozMatchesSelector;
+            _matcher = element.mozMatchesSelector;
         }
 
         if (element.msMatchesSelector) {
-            matcher = element.msMatchesSelector;
+            _matcher = element.msMatchesSelector;
         }
 
-        if (!matcher) {
-            matcher = function() {};
+        if (!_matcher) {
+            _matcher = function() {};
         }
 
-        return matcher;
+        return _matcher;
     }
 
     /**
@@ -110,10 +110,10 @@
     }
 
     function _keyForElement(element) {
-        var index = element_list.indexOf(element);
+        var index = _element_list.indexOf(element);
 
         if (index < 0) {
-            return element_list.push(element) - 1;
+            return _element_list.push(element) - 1;
         }
 
         return index;
@@ -133,11 +133,11 @@
 
         key = _keyForElement(element) + event + selector;
 
-        if (handlers[key]) {
-            return handlers[key];
+        if (_handlers[key]) {
+            return _handlers[key];
         }
 
-        handlers[key] = function(e) {
+        _handlers[key] = function(e) {
             var match = _matches(e.target, selector, element);
             if (match) {
                 if (callback.call(match, e) === false) {
@@ -147,7 +147,7 @@
             }
         };
 
-        return handlers[key];
+        return _handlers[key];
     }
 
     /**
@@ -207,10 +207,10 @@
     window.Gator = function(element) {
         var key = _keyForElement(element);
 
-        if (!instances[key]) {
-            instances[key] = new Gator(element);
+        if (!_instances[key]) {
+            _instances[key] = new Gator(element);
         }
 
-        return instances[key];
+        return _instances[key];
     };
 }) ();

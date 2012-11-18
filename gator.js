@@ -30,10 +30,10 @@
     var Gator = function(element) {
             this.element = element;
         },
-        matcher,
-        handlers = {},
-        instances = {},
-        element_list = [];
+        _matcher,
+        _handlers = {},
+        _instances = {},
+        _element_list = [];
 
     /**
      * cross browser add or event method
@@ -114,33 +114,33 @@
      * @returns {Function}
      */
     function _getMatcher(element) {
-        if (matcher) {
-            return matcher;
+        if (_matcher) {
+            return _matcher;
         }
 
         if (element.matches) {
-            matcher = element.matches;
+            _matcher = element.matches;
         }
 
         if (element.webkitMatchesSelector) {
-            matcher = element.webkitMatchesSelector;
+            _matcher = element.webkitMatchesSelector;
         }
 
         if (element.mozMatchesSelector) {
-            matcher = element.mozMatchesSelector;
+            _matcher = element.mozMatchesSelector;
         }
 
         if (element.msMatchesSelector) {
-            matcher = element.msMatchesSelector;
+            _matcher = element.msMatchesSelector;
         }
 
         // if it doesn't match a native browser method
         // fall back to the gator function
-        if (!matcher) {
-            matcher = _matchesSelector;
+        if (!_matcher) {
+            _matcher = _matchesSelector;
         }
 
-        return matcher;
+        return _matcher;
     }
 
     /**
@@ -180,18 +180,18 @@
     }
 
     function _keyForElement(element) {
-        var i = element_list.length,
+        var i = _element_list.length,
             index = false;
 
         while (i--) {
-            if (element_list[i] === element) {
+            if (_element_list[i] === element) {
                 index = i;
                 break;
             }
         }
 
         if (index === false) {
-            return element_list.push(element) - 1;
+            return _element_list.push(element) - 1;
         }
 
         return index;
@@ -210,11 +210,11 @@
 
         var key = _keyForElement(element) + event + selector;
 
-        if (handlers[key]) {
-            return handlers[key];
+        if (_handlers[key]) {
+            return _handlers[key];
         }
 
-        handlers[key] = function(e) {
+        _handlers[key] = function(e) {
             var match = _matches(e.target || e.srcElement, selector, element);
             if (match) {
                 if (callback.call(match, e) === false) {
@@ -223,7 +223,7 @@
             }
         };
 
-        return handlers[key];
+        return _handlers[key];
     }
 
     /**
@@ -278,10 +278,10 @@
     window.Gator = function(element) {
         var key = _keyForElement(element);
 
-        if (!instances[key]) {
-            instances[key] = new Gator(element);
+        if (!_instances[key]) {
+            _instances[key] = new Gator(element);
         }
 
-        return instances[key];
+        return _instances[key];
     };
 }) ();
