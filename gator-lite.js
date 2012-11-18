@@ -208,7 +208,6 @@
         var key = _keyForElement(element);
 
         if (!instances[key]) {
-            console.log('creating new gator', element);
             instances[key] = new Gator(element);
         }
 
