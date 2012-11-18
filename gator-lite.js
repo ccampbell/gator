@@ -36,6 +36,7 @@
         },
         matcher,
         handlers = {},
+        instances = {},
         element_list = [];
 
     /**
@@ -108,6 +109,17 @@
         }
     }
 
+    function _keyForElement(element) {
+        var index = element_list.indexOf(element);
+
+        if (index < 0) {
+            return element_list.push(element) - 1;
+        }
+
+        return index;
+    }
+
+
     /**
      * gets the event handler for a specific binding
      *
@@ -118,15 +130,8 @@
      * @returns {Function}
      */
     function _handlerForCallback(callback, element, event, selector) {
-        var index = element_list.indexOf(element),
-            key;
 
-        if (index < 0) {
-            element_list.push(element);
-            index = element_list.length - 1;
-        }
-
-        key = index + event + selector;
+        key = _keyForElement(element) + event + selector;
 
         if (handlers[key]) {
             return handlers[key];
@@ -200,6 +205,13 @@
     };
 
     window.Gator = function(element) {
-        return new Gator(element);
+        var key = _keyForElement(element);
+
+        if (!instances[key]) {
+            console.log('creating new gator', element);
+            instances[key] = new Gator(element);
+        }
+
+        return instances[key];
     };
 }) ();
