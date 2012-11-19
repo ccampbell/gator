@@ -216,7 +216,7 @@
         };
 
         for (var i = 0, j = 0; i <= max; i++) {
-            if (i in matches) {
+            if (matches[i]) {
                 for (j = 0; j < matches[i].length; j++) {
                     if (matches[i][j].call(matches[i].match, e) === false) {
                         e.preventDefault();
@@ -259,7 +259,7 @@
 
         for (i = 0; i < events.length; i++) {
 
-            if (!(key in _handlers) && !remove) {
+            if (!_handlers[key] && !remove) {
 
                 // blur and focus do not bubble up but if you use event capturing
                 // then you will get them
