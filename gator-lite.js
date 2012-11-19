@@ -32,6 +32,7 @@
 (function() {
     var _matcher,
         _level = 0,
+        _ROOT = '_root',
         _handlers = {},
         _gator_instances = {},
         _element_list = [];
@@ -116,17 +117,9 @@
      * @returns {number}
      */
     function _keyForElement(element) {
-        var i = _element_list.length,
-            index = false;
+        var index = _element_list.indexOf(element);
 
-        while (i--) {
-            if (_element_list[i] === element) {
-                index = i;
-                break;
-            }
-        }
-
-        if (index === false) {
+        if (index < 0) {
             return _element_list.push(element) - 1;
         }
 
@@ -144,7 +137,7 @@
      */
 
     function _addHandler(element, event, selector, callback) {
-        selector = selector || '_root';
+        selector = selector || _ROOT;
 
         var element_id = _keyForElement(element);
 
@@ -220,10 +213,10 @@
             }
         }
 
-        if (_handlers[key][type]['_root']) {
+        if (_handlers[key][type][_ROOT]) {
             max++;
-            _handlers[key][type]['_root'].match = _element_list[key];
-            matches[max] = _handlers[key][type]['_root'];
+            _handlers[key][type][_ROOT].match = _element_list[key];
+            matches[max] = _handlers[key][type][_ROOT];
         }
 
         // stopPropagation() fails to set cancelBubble to true in Webkit
