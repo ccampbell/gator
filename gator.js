@@ -264,10 +264,9 @@
         }
     }
 
-    function _handleEvent(e) {
+    function _handleEvent(key, e) {
         var target = e.target || e.srcElement,
             type = e.type,
-            key = _keyForElement(this),
             selector,
             match,
             matches = {},
@@ -288,7 +287,7 @@
         // find all events that match
         for (selector in _handlers[key][type]) {
             _level = 0;
-            match = _matches(target, selector, this);
+            match = _matches(target, selector, _element_list[key]);
             if (match) {
                 max = Math.max(max, _level);
                 _handlers[key][type][selector].match = match;
@@ -298,7 +297,7 @@
 
         if (_handlers[key][type]['_root']) {
             max++;
-            _handlers[key][type]['_root'].match = this;
+            _handlers[key][type]['_root'].match = _element_list[key];
             matches[max] = _handlers[key][type]['_root'];
         }
 
@@ -342,8 +341,13 @@
             selector = null;
         }
 
+        var key = _keyForElement(this.element),
+            global_callback = function(e) {
+                _handleEvent(key, e);
+            };
+
         for (var i = 0; i < events.length; i++) {
-            _event(this.element, events[i], _handleEvent.bind(this.element));
+            _event(this.element, events[i], global_callback);
 
             if (remove) {
                 _removeHandler(this.element, events[i], selector, callback);
