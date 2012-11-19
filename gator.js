@@ -28,8 +28,9 @@
  */
 (function() {
     var _matcher,
+        _level = 0,
         _handlers = {},
-        _instances = {},
+        _gator_instances = {},
         _element_list = [];
 
     /**
@@ -41,9 +42,12 @@
      * @param {Function} callback
      * @returns void
      */
-    function _event(remove, element, type, callback) {
-        if (element.addEventListener) {
+    function _event(element, type, callback, remove) {
+        if (_keyForElement(element) in _handlers && !remove) {
+            return;
+        }
 
+        if (element.addEventListener) {
             // blur and focus do not bubble up but if you use event capturing
             // then you will get them
             var use_capture = type == 'blur' || type == 'focus';
@@ -175,6 +179,7 @@
         // is a <span> inside of the a tag that it is the target,
         // it should still work
         if (element.parentNode) {
+            _level++;
             return _matches(element.parentNode, selector, bound_element);
         }
     }
@@ -212,24 +217,110 @@
      * @param {string} selector
      * @returns {Function}
      */
-    function _handlerForCallback(callback, element, event, selector) {
 
-        var key = _keyForElement(element) + event + selector;
+    function _addHandler(element, event, selector, callback) {
+        selector = selector || '_root';
 
-        if (_handlers[key]) {
-            return _handlers[key];
+        var element_id = _keyForElement(element);
+
+        if (!_handlers[element_id]) {
+            _handlers[element_id] = {};
         }
 
-        _handlers[key] = function(e) {
-            var match = _matches(e.target || e.srcElement, selector, element);
-            if (match) {
-                if (callback.call(match, e) === false) {
-                    _cancel(e);
-                }
+        if (!_handlers[element_id][event]) {
+            _handlers[element_id][event] = {};
+        }
+
+        if (!_handlers[element_id][event][selector]) {
+            _handlers[element_id][event][selector] = [];
+        }
+
+        _handlers[element_id][event][selector].push(callback);
+    }
+
+    function _removeHandler(element, event, selector, callback) {
+        var key = _keyForElement(element),
+            remove,
+            i;
+
+        if (!callback && !selector) {
+            delete _handlers[key][event];
+            return;
+        }
+
+        if (!callback) {
+            delete _handlers[key][event][selector];
+            return;
+        }
+
+        for (i = 0; i < _handlers[key][event][selector].length; i++) {
+            if (_handlers[key][event][selector][i] === callback) {
+                remove = i;
             }
+        }
+
+        if (remove) {
+            _handlers[key][event][selector].pop(remove, 1);
+        }
+    }
+
+    function _handleEvent(e) {
+        var target = e.target || e.srcElement,
+            type = e.type,
+            key = _keyForElement(this),
+            selector,
+            match,
+            matches = {},
+            max = 0;
+
+        if (type == 'focusin') {
+            type = 'focus';
+        }
+
+        if (type == 'focusout') {
+            type = 'blur';
+        }
+
+        if (!_handlers[key][type]) {
+            return;
+        }
+
+        // find all events that match
+        for (selector in _handlers[key][type]) {
+            _level = 0;
+            match = _matches(target, selector, this);
+            if (match) {
+                max = Math.max(max, _level);
+                _handlers[key][type][selector].match = match;
+                matches[_level] = _handlers[key][type][selector];
+            }
+        }
+
+        if (_handlers[key][type]['_root']) {
+            max++;
+            _handlers[key][type]['_root'].match = this;
+            matches[max] = _handlers[key][type]['_root'];
+        }
+
+        // stopPropagation() fails to set cancelBubble to true in Webkit
+        e.stopPropagation = function() {
+            e.cancelBubble = true;
         };
 
-        return _handlers[key];
+        for (var i = 0, j = 0; i <= max; i++) {
+            if (i in matches) {
+                for (j = 0; j < matches[i].length; j++) {
+                    if (matches[i][j].call(matches[i].match, e) === false) {
+                        _cancel(e);
+                        return;
+                    }
+
+                    if (e.cancelBubble) {
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -252,7 +343,14 @@
         }
 
         for (var i = 0; i < events.length; i++) {
-            _event(remove, this.element, events[i], _handlerForCallback(callback, this.element, events[i], selector));
+            _event(this.element, events[i], _handleEvent.bind(this.element));
+
+            if (remove) {
+                _removeHandler(this.element, events[i], selector, callback);
+                continue;
+            }
+
+            _addHandler(this.element, events[i], selector, callback);
         }
 
         return this;
@@ -274,11 +372,11 @@
             // multiple events from the same node
             //
             // for example: Gator(document).on(...
-            if (!_instances[key]) {
-                _instances[key] = new Gator(element);
+            if (!_gator_instances[key]) {
+                _gator_instances[key] = new Gator(element);
             }
 
-            return _instances[key];
+            return _gator_instances[key];
         }
 
         this.element = element;
