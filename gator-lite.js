@@ -183,20 +183,11 @@
     }
 
     function _handleEvent(key, e) {
-        var target = e.target || e.srcElement,
-            type = e.type,
+        var type = e.type,
             selector,
             match,
             matches = {},
             max = 0;
-
-        if (type == 'focusin') {
-            type = 'focus';
-        }
-
-        if (type == 'focusout') {
-            type = 'blur';
-        }
 
         if (!_handlers[key][type]) {
             return;
@@ -205,7 +196,7 @@
         // find all events that match
         for (selector in _handlers[key][type]) {
             _level = 0;
-            match = _matches(target, selector, _element_list[key]);
+            match = _matches(e.target, selector, _element_list[key]);
             if (match) {
                 max = Math.max(max, _level);
                 _handlers[key][type][selector].match = match;
