@@ -286,12 +286,14 @@
 
         // find all events that match
         for (selector in _handlers[key][type]) {
-            _level = 0;
-            match = _matches(target, selector, _element_list[key]);
-            if (match) {
-                max = Math.max(max, _level);
-                _handlers[key][type][selector].match = match;
-                matches[_level] = _handlers[key][type][selector];
+            if (_handlers[key][type].hasOwnProperty(selector)) {
+                _level = 0;
+                match = _matches(target, selector, _element_list[key]);
+                if (match) {
+                    max = Math.max(max, _level);
+                    _handlers[key][type][selector].match = match;
+                    matches[_level] = _handlers[key][type][selector];
+                }
             }
         }
 
