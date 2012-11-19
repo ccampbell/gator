@@ -85,6 +85,7 @@
     }
 
     /**
+     * fallback for browsers that don't support matches/matchesSelector
      * for simple selector matching of ids, class names, or tag names
      *
      * @param {string} selector
