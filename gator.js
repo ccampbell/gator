@@ -344,9 +344,10 @@
         var key = _keyForElement(this.element),
             global_callback = function(e) {
                 _handleEvent(key, e);
-            };
+            },
+            i;
 
-        for (var i = 0; i < events.length; i++) {
+        for (i = 0; i < events.length; i++) {
             _event(this.element, events[i], global_callback);
 
             if (remove) {
