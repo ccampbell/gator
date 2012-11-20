@@ -170,7 +170,6 @@
             selector,
             match,
             matches = {},
-            max = 0,
             i = 0,
             j = 0;
 
@@ -185,7 +184,6 @@
                 match = _matches(e.target, selector, _element_list[key]);
                 if (match) {
                     _level++;
-                    max = Math.max(max, _level);
                     _handlers[key][type][selector].match = match;
                     matches[_level] = _handlers[key][type][selector];
                 }
@@ -197,7 +195,7 @@
             e.cancelBubble = true;
         };
 
-        for (i = 0; i <= max; i++) {
+        for (i = 0; i <= _level; i++) {
             if (matches[i]) {
                 for (j = 0; j < matches[i].length; j++) {
                     if (matches[i][j].call(matches[i].match, e) === false) {
