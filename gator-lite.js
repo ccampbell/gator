@@ -227,7 +227,7 @@
      * @param {string|Array} events
      * @param {string} selector
      * @param {Function} callback
-     * @param {boolean=} off
+     * @param {boolean=} remove
      * @returns {Object}
      */
     function _bind(events, selector, callback, remove) {
@@ -310,20 +310,12 @@
      *
      * @param {string|Array} events
      * @param {string} selector
+     * @param {Function} callback
      * @returns {Object}
      */
     Gator.prototype.off = function(events, selector, callback) {
         return _bind.call(this, events, selector, callback, true);
     };
-
-    // Gator.on = function(events, selector, callback) {
-    //     return Gator(document).on(events, selector, callback);
-    // };
-
-    // Gator.off = function(events, selector, callback) {
-    //     return Gator(document).off(events, selector, callback);
-    // };
-
 
     window.Gator = Gator;
 }) ();
