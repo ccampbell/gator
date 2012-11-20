@@ -146,22 +146,22 @@
     }
 
     function _removeHandler(element, event, selector, callback) {
-        var key = _keyForElement(element),
+        var element_id = _keyForElement(element),
             i;
 
         if (!callback && !selector) {
-            delete _handlers[key][event];
+            delete _handlers[element_id][event];
             return;
         }
 
         if (!callback) {
-            delete _handlers[key][event][selector];
+            delete _handlers[element_id][event][selector];
             return;
         }
 
-        for (i = 0; i < _handlers[key][event][selector].length; i++) {
-            if (_handlers[key][event][selector][i] === callback) {
-                _handlers[key][event][selector].pop(i, 1);
+        for (i = 0; i < _handlers[element_id][event][selector].length; i++) {
+            if (_handlers[element_id][event][selector][i] === callback) {
+                _handlers[element_id][event][selector].pop(i, 1);
                 break;
             }
         }
@@ -315,6 +315,15 @@
     Gator.prototype.off = function(events, selector, callback) {
         return _bind.call(this, events, selector, callback, true);
     };
+
+    // Gator.on = function(events, selector, callback) {
+    //     return Gator(document).on(events, selector, callback);
+    // };
+
+    // Gator.off = function(events, selector, callback) {
+    //     return Gator(document).off(events, selector, callback);
+    // };
+
 
     window.Gator = Gator;
 }) ();
