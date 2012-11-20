@@ -181,23 +181,18 @@
         }
 
         // find all events that match
+        _level = 0;
         for (selector in _handlers[key][type]) {
             if (_handlers[key][type].hasOwnProperty(selector)) {
-                _level = 0;
                 match = _matches(e.target, selector, _element_list[key]);
                 if (match) {
+                    _level++;
                     max = Math.max(max, _level);
                     _handlers[key][type][selector].match = match;
                     matches[_level] = _handlers[key][type][selector];
                 }
             }
         }
-
-        // if (_handlers[key][type]['_root']) {
-        //     max++;
-        //     _handlers[key][type]['_root'].match = _element_list[key];
-        //     matches[max] = _handlers[key][type]['_root'];
-        // }
 
         // stopPropagation() fails to set cancelBubble to true in Webkit
         e.stopPropagation = function() {

@@ -282,11 +282,12 @@
         }
 
         // find all events that match
+        _level = 0;
         for (selector in _handlers[key][type]) {
             if (_handlers[key][type].hasOwnProperty(selector)) {
-                _level = 0;
                 match = _matches(target, selector, _element_list[key]);
                 if (match) {
+                    _level++;
                     max = Math.max(max, _level);
                     _handlers[key][type][selector].match = match;
                     matches[_level] = _handlers[key][type][selector];
