@@ -126,8 +126,6 @@
     }
 
     function _addHandler(element, event, selector, callback) {
-        selector = selector || '_root';
-
         var element_id = _keyForElement(element);
 
         if (!_handlers[element_id]) {
@@ -230,9 +228,9 @@
             events = [events];
         }
 
-        if (!remove && !callback) {
+        if (!callback && typeof (selector) == 'function') {
             callback = selector;
-            selector = null;
+            selector = '_root';
         }
 
         var key = _keyForElement(this.element),
