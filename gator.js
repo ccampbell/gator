@@ -158,7 +158,7 @@
     function _matches(element, selector, bound_element) {
 
         // no selector means this event was bound directly to this element
-        if (!selector) {
+        if (selector == '_root') {
             return element;
         }
 
@@ -292,12 +292,6 @@
                     matches[_level] = _handlers[key][type][selector];
                 }
             }
-        }
-
-        if (_handlers[key][type]['_root']) {
-            max++;
-            _handlers[key][type]['_root'].match = _element_list[key];
-            matches[max] = _handlers[key][type]['_root'];
         }
 
         // stopPropagation() fails to set cancelBubble to true in Webkit

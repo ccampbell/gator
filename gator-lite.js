@@ -17,7 +17,7 @@
  * Simple Event Delegation
  *
  * Lite Version
- * Compatible with IE9+, FF 3.6+, Safari 5+, Chrome
+ * Compatible with IE 9+, FF 3.6+, Safari 5+, Chrome
  *
  *             .-._   _ _ _ _ _ _ _ _
  *  .-''-.__.-'00  '-' ' ' ' ' ' ' ' '-.
@@ -32,7 +32,6 @@
 (function() {
     var _matcher,
         _level = 0,
-        _ROOT = '_root',
         _handlers = {},
         _gator_instances = {},
         _element_list = [];
@@ -84,7 +83,7 @@
     function _matches(element, selector, bound_element) {
 
         // no selector means this event was bound directly to this element
-        if (!selector) {
+        if (selector == '_root') {
             return element;
         }
 
@@ -127,7 +126,7 @@
     }
 
     function _addHandler(element, event, selector, callback) {
-        selector = selector || _ROOT;
+        selector = selector || '_root';
 
         var element_id = _keyForElement(element);
 
@@ -194,11 +193,11 @@
             }
         }
 
-        if (_handlers[key][type][_ROOT]) {
-            max++;
-            _handlers[key][type][_ROOT].match = _element_list[key];
-            matches[max] = _handlers[key][type][_ROOT];
-        }
+        // if (_handlers[key][type]['_root']) {
+        //     max++;
+        //     _handlers[key][type]['_root'].match = _element_list[key];
+        //     matches[max] = _handlers[key][type]['_root'];
+        // }
 
         // stopPropagation() fails to set cancelBubble to true in Webkit
         e.stopPropagation = function() {
