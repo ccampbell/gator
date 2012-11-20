@@ -16,6 +16,10 @@
  * GATOR.JS
  * Simple Event Delegation
  *
+ * Compatible with IE 9+, FF 3.6+, Safari 5+, Chrome
+ *
+ * Include legacy.js for compatibility with older browsers
+ *
  *             .-._   _ _ _ _ _ _ _ _
  *  .-''-.__.-'00  '-' ' ' ' ' ' ' ' '-.
  * '.___ '    .   .--_'-' '-' '-' _'-' '._
@@ -29,86 +33,25 @@
 (function() {
     var _matcher,
         _level = 0,
+        _id = 0,
         _handlers = {},
-        _gator_instances = {},
-        _element_list = [];
+        _gator_instances = {};
 
-    /**
-     * cross browser add or event method
-     *
-     * @param {boolean} remove
-     * @param {Node|HTMLDocument} element
-     * @param {string} type
-     * @param {Function} callback
-     * @returns void
-     */
-    function _event(element, type, callback) {
-        if (_handlers[_keyForElement(element)]) {
-            return;
-        }
+    function _addEvent(gator, type, callback, handlers) {
+        if (!handlers[gator.id]) {
 
-        if (element.addEventListener) {
             // blur and focus do not bubble up but if you use event capturing
             // then you will get them
             var use_capture = type == 'blur' || type == 'focus';
-            element.addEventListener(type, callback, use_capture);
-            return;
+            gator.element.addEventListener(type, callback, use_capture);
         }
 
-        // internet explorer does not support event capturing
-        // but does have fallback events to use that will bubble
-        if (type == 'focus') {
-            type = 'focusin';
-        }
-
-        if (type == 'blur') {
-            type = 'focusout';
-        }
-
-        element.attachEvent('on' + type, callback);
+        return type;
     }
 
-    /**
-     * stops propagation and prevents default behavior
-     * of this event
-     *
-     * @returns void
-     */
     function _cancel(e) {
-        if (e.preventDefault) {
-            e.preventDefault();
-        }
-
-        if (e.stopPropagation) {
-            e.stopPropagation();
-        }
-
-        // for IE
-        e.returnValue = false;
-        e.cancelBubble = true;
-    }
-
-    /**
-     * fallback for browsers that don't support matches/matchesSelector
-     * for simple selector matching of ids, class names, or tag names
-     *
-     * @param {string} selector
-     * @returns {boolean}
-     */
-    function _matchesSelector(selector) {
-
-        // check for class name
-        if (selector.charAt(0) === '.') {
-            return (' ' + this.className + ' ').indexOf(' ' + selector.slice(1) + ' ') > -1;
-        }
-
-        // check for id
-        if (selector.charAt(0) === '#') {
-            return this.id === selector.slice(1);
-        }
-
-        // check for tag
-        return this.tagName === selector.toUpperCase();
+        e.preventDefault();
+        e.stopPropagation();
     }
 
     /**
@@ -184,111 +127,62 @@
         }
     }
 
-    /**
-     * finds index of element in array
-     *
-     * @param {Node} element
-     * @returns {number}
-     */
-    function _keyForElement(element) {
-        var i = _element_list.length,
-            index = false;
-
-        while (i--) {
-            if (_element_list[i] === element) {
-                index = i;
-                break;
-            }
+    function _addHandler(gator, event, selector, callback) {
+        if (!_handlers[gator.id]) {
+            _handlers[gator.id] = {};
         }
 
-        if (index === false) {
-            return _element_list.push(element) - 1;
+        if (!_handlers[gator.id][event]) {
+            _handlers[gator.id][event] = {};
         }
 
-        return index;
+        if (!_handlers[gator.id][event][selector]) {
+            _handlers[gator.id][event][selector] = [];
+        }
+
+        _handlers[gator.id][event][selector].push(callback);
     }
 
-    /**
-     * gets the event handler for a specific binding
-     *
-     * @param {Function} callback
-     * @param {Node|HTMLDocument} element
-     * @param {string} event
-     * @param {string} selector
-     * @returns {Function}
-     */
-
-    function _addHandler(element, event, selector, callback) {
-        var element_id = _keyForElement(element);
-
-        if (!_handlers[element_id]) {
-            _handlers[element_id] = {};
-        }
-
-        if (!_handlers[element_id][event]) {
-            _handlers[element_id][event] = {};
-        }
-
-        if (!_handlers[element_id][event][selector]) {
-            _handlers[element_id][event][selector] = [];
-        }
-
-        _handlers[element_id][event][selector].push(callback);
-    }
-
-    function _removeHandler(element, event, selector, callback) {
-        var element_id = _keyForElement(element),
-            remove,
-            i;
-
+    function _removeHandler(gator, event, selector, callback) {
         if (!callback && !selector) {
-            delete _handlers[element_id][event];
+            delete _handlers[gator.id][event];
             return;
         }
 
         if (!callback) {
-            delete _handlers[element_id][event][selector];
+            delete _handlers[gator.id][event][selector];
             return;
         }
 
-        for (i = 0; i < _handlers[element_id][event][selector].length; i++) {
-            if (_handlers[element_id][event][selector][i] === callback) {
-                _handlers[element_id][event][selector].pop(i, 1);
+        for (var i = 0; i < _handlers[gator.id][event][selector].length; i++) {
+            if (_handlers[gator.id][event][selector][i] === callback) {
+                _handlers[gator.id][event][selector].pop(i, 1);
                 break;
             }
         }
     }
 
-    function _handleEvent(key, e) {
-        var target = e.target || e.srcElement,
-            type = e.type,
+    function _handleEvent(id, e) {
+        var type = e.type,
             selector,
             match,
             matches = {},
             i = 0,
             j = 0;
 
-        if (type == 'focusin') {
-            type = 'focus';
-        }
-
-        if (type == 'focusout') {
-            type = 'blur';
-        }
-
-        if (!_handlers[key][type]) {
+        if (!_handlers[id][type]) {
             return;
         }
 
         // find all events that match
         _level = 0;
-        for (selector in _handlers[key][type]) {
-            if (_handlers[key][type].hasOwnProperty(selector)) {
-                match = _matches(target, selector, _element_list[key]);
+        for (selector in _handlers[id][type]) {
+            if (_handlers[id][type].hasOwnProperty(selector)) {
+                match = _matches(e.target, selector, _gator_instances[id].element);
                 if (match) {
                     _level++;
-                    _handlers[key][type][selector].match = match;
-                    matches[_level] = _handlers[key][type][selector];
+                    _handlers[id][type][selector].match = match;
+                    matches[_level] = _handlers[id][type][selector];
                 }
             }
         }
@@ -302,7 +196,7 @@
             if (matches[i]) {
                 for (j = 0; j < matches[i].length; j++) {
                     if (matches[i][j].call(matches[i].match, e) === false) {
-                        _cancel(e);
+                        Gator.cancel(e);
                         return;
                     }
 
@@ -333,21 +227,21 @@
             selector = '_root';
         }
 
-        var key = _keyForElement(this.element),
+        var id = this.id,
             global_callback = function(e) {
-                _handleEvent(key, e);
+                _handleEvent(id, e);
             },
             i;
 
         for (i = 0; i < events.length; i++) {
-            _event(this.element, events[i], global_callback);
+            events[i] = Gator.addEvent(this, events[i], global_callback, _handlers);
 
             if (remove) {
-                _removeHandler(this.element, events[i], selector, callback);
+                _removeHandler(this, events[i], selector, callback);
                 continue;
             }
 
-            _addHandler(this.element, events[i], selector, callback);
+            _addHandler(this, events[i], selector, callback);
         }
 
         return this;
@@ -358,28 +252,31 @@
      *
      * @param {Node} element
      */
-    function Gator(element) {
+    function Gator(element, id) {
 
         // called as function
         if (!(this instanceof Gator)) {
-            var key = _keyForElement(element);
 
             // only keep one Gator instance per node to make sure that
             // we don't create a ton of new objects if you want to delegate
             // multiple events from the same node
             //
             // for example: Gator(document).on(...
-            if (!_gator_instances[key]) {
-                _gator_instances[key] = new Gator(element);
+            for (var key in _gator_instances) {
+                if (_gator_instances[key].element === element) {
+                    return _gator_instances[key];
+                }
             }
 
-            return _gator_instances[key];
+            _id++;
+            _gator_instances[_id] = new Gator(element, _id);
+
+            return _gator_instances[_id];
         }
 
         this.element = element;
+        this.id = _id;
     }
-
-    Gator.matchesSelector = _matchesSelector;
 
     /**
      * adds an event
@@ -404,6 +301,10 @@
     Gator.prototype.off = function(events, selector, callback) {
         return _bind.call(this, events, selector, callback, true);
     };
+
+    Gator.matchesSelector = function() {};
+    Gator.cancel = _cancel;
+    Gator.addEvent = _addEvent;
 
     window.Gator = Gator;
 }) ();
