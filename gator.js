@@ -164,6 +164,7 @@
 
     function _handleEvent(id, e) {
         var type = e.type,
+            target = e.target || e.srcElement,
             selector,
             match,
             matches = {},
@@ -178,7 +179,7 @@
         _level = 0;
         for (selector in _handlers[id][type]) {
             if (_handlers[id][type].hasOwnProperty(selector)) {
-                match = _matches(e.target, selector, _gator_instances[id].element);
+                match = _matches(target, selector, _gator_instances[id].element);
                 if (match) {
                     _level++;
                     _handlers[id][type][selector].match = match;
