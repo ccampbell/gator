@@ -255,12 +255,9 @@
 
         for (i = 0; i < _handlers[key][event][selector].length; i++) {
             if (_handlers[key][event][selector][i] === callback) {
-                remove = i;
+                _handlers[key][event][selector].pop(i, 1);
+                break;
             }
-        }
-
-        if (remove) {
-            _handlers[key][event][selector].pop(remove, 1);
         }
     }
 

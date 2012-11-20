@@ -126,16 +126,6 @@
         return index;
     }
 
-    /**
-     * gets the event handler for a specific binding
-     *
-     * @param {Function} callback
-     * @param {Node|HTMLDocument} element
-     * @param {string} event
-     * @param {string} selector
-     * @returns {Function}
-     */
-
     function _addHandler(element, event, selector, callback) {
         selector = selector || _ROOT;
 
@@ -158,7 +148,6 @@
 
     function _removeHandler(element, event, selector, callback) {
         var key = _keyForElement(element),
-            remove,
             i;
 
         if (!callback && !selector) {
@@ -173,12 +162,9 @@
 
         for (i = 0; i < _handlers[key][event][selector].length; i++) {
             if (_handlers[key][event][selector][i] === callback) {
-                remove = i;
+                _handlers[key][event][selector].pop(i, 1);
+                break;
             }
-        }
-
-        if (remove) {
-            _handlers[key][event][selector].pop(remove, 1);
         }
     }
 
@@ -187,7 +173,9 @@
             selector,
             match,
             matches = {},
-            max = 0;
+            max = 0,
+            i = 0,
+            j = 0;
 
         if (!_handlers[key][type]) {
             return;
@@ -217,7 +205,7 @@
             e.cancelBubble = true;
         };
 
-        for (var i = 0, j = 0; i <= max; i++) {
+        for (i = 0; i <= max; i++) {
             if (matches[i]) {
                 for (j = 0; j < matches[i].length; j++) {
                     if (matches[i][j].call(matches[i].match, e) === false) {
