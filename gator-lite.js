@@ -32,9 +32,9 @@
 (function() {
     var _matcher,
         _level = 0,
+        _id = 0,
         _handlers = {},
-        _gator_instances = {},
-        _element_list = [];
+        _gator_instances = {};
 
     /**
      * returns function to use for determining if an element
@@ -66,7 +66,7 @@
         // if it doesn't match a native browser method
         // fall back to the gator function
         if (!_matcher) {
-            return function() {};
+            _matcher = Gator.matchesSelector;
         }
 
         return _matcher;
@@ -109,63 +109,42 @@
         }
     }
 
-    /**
-     * finds index of element in array
-     *
-     * @param {Node} element
-     * @returns {number}
-     */
-    function _keyForElement(element) {
-        var index = _element_list.indexOf(element);
-
-        if (index < 0) {
-            return _element_list.push(element) - 1;
+    function _addHandler(gator, event, selector, callback) {
+        if (!_handlers[gator.id]) {
+            _handlers[gator.id] = {};
         }
 
-        return index;
+        if (!_handlers[gator.id][event]) {
+            _handlers[gator.id][event] = {};
+        }
+
+        if (!_handlers[gator.id][event][selector]) {
+            _handlers[gator.id][event][selector] = [];
+        }
+
+        _handlers[gator.id][event][selector].push(callback);
     }
 
-    function _addHandler(element, event, selector, callback) {
-        var element_id = _keyForElement(element);
-
-        if (!_handlers[element_id]) {
-            _handlers[element_id] = {};
-        }
-
-        if (!_handlers[element_id][event]) {
-            _handlers[element_id][event] = {};
-        }
-
-        if (!_handlers[element_id][event][selector]) {
-            _handlers[element_id][event][selector] = [];
-        }
-
-        _handlers[element_id][event][selector].push(callback);
-    }
-
-    function _removeHandler(element, event, selector, callback) {
-        var element_id = _keyForElement(element),
-            i;
-
+    function _removeHandler(gator, event, selector, callback) {
         if (!callback && !selector) {
-            delete _handlers[element_id][event];
+            delete _handlers[gator.id][event];
             return;
         }
 
         if (!callback) {
-            delete _handlers[element_id][event][selector];
+            delete _handlers[gator.id][event][selector];
             return;
         }
 
-        for (i = 0; i < _handlers[element_id][event][selector].length; i++) {
-            if (_handlers[element_id][event][selector][i] === callback) {
-                _handlers[element_id][event][selector].pop(i, 1);
+        for (var i = 0; i < _handlers[gator.id][event][selector].length; i++) {
+            if (_handlers[gator.id][event][selector][i] === callback) {
+                _handlers[gator.id][event][selector].pop(i, 1);
                 break;
             }
         }
     }
 
-    function _handleEvent(key, e) {
+    function _handleEvent(id, e) {
         var type = e.type,
             selector,
             match,
@@ -173,19 +152,19 @@
             i = 0,
             j = 0;
 
-        if (!_handlers[key][type]) {
+        if (!_handlers[id][type]) {
             return;
         }
 
         // find all events that match
         _level = 0;
-        for (selector in _handlers[key][type]) {
-            if (_handlers[key][type].hasOwnProperty(selector)) {
-                match = _matches(e.target, selector, _element_list[key]);
+        for (selector in _handlers[id][type]) {
+            if (_handlers[id][type].hasOwnProperty(selector)) {
+                match = _matches(e.target, selector, _gator_instances[id].element);
                 if (match) {
                     _level++;
-                    _handlers[key][type][selector].match = match;
-                    matches[_level] = _handlers[key][type][selector];
+                    _handlers[id][type][selector].match = match;
+                    matches[_level] = _handlers[id][type][selector];
                 }
             }
         }
@@ -231,15 +210,15 @@
             selector = '_root';
         }
 
-        var key = _keyForElement(this.element),
+        var id = this.id,
             global_callback = function(e) {
-                _handleEvent(key, e);
+                _handleEvent(id, e);
             },
             i;
 
         for (i = 0; i < events.length; i++) {
 
-            if (!_handlers[key]) {
+            if (!_handlers[this.id]) {
 
                 // blur and focus do not bubble up but if you use event capturing
                 // then you will get them
@@ -248,11 +227,11 @@
             }
 
             if (remove) {
-                _removeHandler(this.element, events[i], selector, callback);
+                _removeHandler(this, events[i], selector, callback);
                 continue;
             }
 
-            _addHandler(this.element, events[i], selector, callback);
+            _addHandler(this, events[i], selector, callback);
         }
 
         return this;
@@ -263,25 +242,30 @@
      *
      * @param {Node} element
      */
-    function Gator(element) {
+    function Gator(element, id) {
 
         // called as function
         if (!(this instanceof Gator)) {
-            var key = _keyForElement(element);
 
             // only keep one Gator instance per node to make sure that
             // we don't create a ton of new objects if you want to delegate
             // multiple events from the same node
             //
             // for example: Gator(document).on(...
-            if (!_gator_instances[key]) {
-                _gator_instances[key] = new Gator(element);
+            for (var key in _gator_instances) {
+                if (_gator_instances[key].element === element) {
+                    return _gator_instances[key];
+                }
             }
 
-            return _gator_instances[key];
+            _id++;
+            _gator_instances[_id] = new Gator(element, _id);
+
+            return _gator_instances[_id];
         }
 
         this.element = element;
+        this.id = _id;
     }
 
     /**
@@ -307,6 +291,8 @@
     Gator.prototype.off = function(events, selector, callback) {
         return _bind.call(this, events, selector, callback, true);
     };
+
+    Gator.matchesSelector = function() {};
 
     window.Gator = Gator;
 }) ();
