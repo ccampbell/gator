@@ -228,7 +228,7 @@
             events = [events];
         }
 
-        if (!callback && typeof (selector) == 'function') {
+        if (!callback && typeof(selector) == 'function') {
             callback = selector;
             selector = '_root';
         }
