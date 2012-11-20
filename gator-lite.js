@@ -248,7 +248,8 @@
 
         for (i = 0; i < events.length; i++) {
 
-            if (!_handlers[key] && !remove) {
+            if (!_handlers[key]) {
+
                 // blur and focus do not bubble up but if you use event capturing
                 // then you will get them
                 var use_capture = events[i] == 'blur' || events[i] == 'focus';
