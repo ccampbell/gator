@@ -19,6 +19,8 @@
  * Lite Version
  * Compatible with IE 9+, FF 3.6+, Safari 5+, Chrome
  *
+ * Include legacy.js for compatibility with older browsers
+ *
  *             .-._   _ _ _ _ _ _ _ _
  *  .-''-.__.-'00  '-' ' ' ' ' ' ' ' '-.
  * '.___ '    .   .--_'-' '-' '-' _'-' '._
@@ -35,6 +37,23 @@
         _id = 0,
         _handlers = {},
         _gator_instances = {};
+
+    function _addEvent(gator, type, callback) {
+        if (!_handlers[gator.id]) {
+
+            // blur and focus do not bubble up but if you use event capturing
+            // then you will get them
+            var use_capture = type == 'blur' || type == 'focus';
+            gator.element.addEventListener(type, callback, use_capture);
+        }
+
+        return type;
+    }
+
+    function _cancel(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
 
     /**
      * returns function to use for determining if an element
@@ -178,8 +197,7 @@
             if (matches[i]) {
                 for (j = 0; j < matches[i].length; j++) {
                     if (matches[i][j].call(matches[i].match, e) === false) {
-                        e.preventDefault();
-                        e.stopPropagation();
+                        Gator.cancel(e);
                         return;
                     }
 
@@ -217,14 +235,7 @@
             i;
 
         for (i = 0; i < events.length; i++) {
-
-            if (!_handlers[this.id]) {
-
-                // blur and focus do not bubble up but if you use event capturing
-                // then you will get them
-                var use_capture = events[i] == 'blur' || events[i] == 'focus';
-                this.element.addEventListener(events[i], global_callback, use_capture);
-            }
+            events[i] = Gator.addEvent(this, events[i], global_callback);
 
             if (remove) {
                 _removeHandler(this, events[i], selector, callback);
@@ -293,6 +304,8 @@
     };
 
     Gator.matchesSelector = function() {};
+    Gator.cancel = _cancel;
+    Gator.addEvent = _addEvent;
 
     window.Gator = Gator;
 }) ();
