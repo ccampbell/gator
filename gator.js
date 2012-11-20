@@ -42,8 +42,8 @@
      * @param {Function} callback
      * @returns void
      */
-    function _event(element, type, callback, remove) {
-        if (_keyForElement(element) in _handlers && !remove) {
+    function _event(element, type, callback) {
+        if (_handlers[_keyForElement(element)]) {
             return;
         }
 
@@ -51,7 +51,7 @@
             // blur and focus do not bubble up but if you use event capturing
             // then you will get them
             var use_capture = type == 'blur' || type == 'focus';
-            element[remove ? 'removeEventListener' : 'addEventListener'](type, callback, use_capture);
+            element.addEventListener(type, callback, use_capture);
             return;
         }
 
@@ -65,7 +65,7 @@
             type = 'focusout';
         }
 
-        element[remove ? 'detachEvent' : 'attachEvent']('on' + type, callback);
+        element.attachEvent('on' + type, callback);
     }
 
     /**
@@ -300,7 +300,7 @@
         };
 
         for (var i = 0, j = 0; i <= max; i++) {
-            if (i in matches) {
+            if (matches[i]) {
                 for (j = 0; j < matches[i].length; j++) {
                     if (matches[i][j].call(matches[i].match, e) === false) {
                         _cancel(e);

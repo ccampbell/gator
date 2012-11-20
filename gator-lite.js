@@ -249,11 +249,10 @@
         for (i = 0; i < events.length; i++) {
 
             if (!_handlers[key] && !remove) {
-
                 // blur and focus do not bubble up but if you use event capturing
                 // then you will get them
                 var use_capture = events[i] == 'blur' || events[i] == 'focus';
-                this.element[remove ? 'removeEventListener' : 'addEventListener'](events[i], global_callback, use_capture);
+                this.element.addEventListener(events[i], global_callback, use_capture);
             }
 
             if (remove) {
