@@ -11,7 +11,7 @@
  * Gator(ul).on('click', 'li.test', _doSomething); will not
  */
 Gator.addEvent = function(gator, type, callback, handlers) {
-    if (!handlers[gator.id]) {
+    if (!handlers[gator.id] || !handlers[gator.id][type]) {
         if (gator.element.addEventListener) {
 
             // blur and focus do not bubble up but if you use event capturing

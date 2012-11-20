@@ -38,7 +38,7 @@
         _gator_instances = {};
 
     function _addEvent(gator, type, callback, handlers) {
-        if (!handlers[gator.id]) {
+        if (!handlers[gator.id] || !handlers[gator.id][type]) {
 
             // blur and focus do not bubble up but if you use event capturing
             // then you will get them
