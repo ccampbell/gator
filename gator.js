@@ -16,6 +16,8 @@
  * GATOR.JS
  * Simple Event Delegation
  *
+ * @version 1.0
+ *
  * Compatible with IE 9+, FF 3.6+, Safari 5+, Chrome
  *
  * Include legacy.js for compatibility with older browsers
@@ -189,6 +191,7 @@
         }
 
         // stopPropagation() fails to set cancelBubble to true in Webkit
+        // @see http://code.google.com/p/chromium/issues/detail?id=162270
         e.stopPropagation = function() {
             e.cancelBubble = true;
         };
