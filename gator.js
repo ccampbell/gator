@@ -83,6 +83,10 @@
             _matcher = element.msMatchesSelector;
         }
 
+        if (element.oMatchesSelector) {
+            _matcher = element.oMatchesSelector;
+        }
+
         // if it doesn't match a native browser method
         // fall back to the gator function
         if (!_matcher) {
