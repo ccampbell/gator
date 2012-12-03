@@ -10,15 +10,11 @@
  * Gator(ul).on('click', '.test', _doSomething); will work but
  * Gator(ul).on('click', 'li.test', _doSomething); will not
  */
-Gator.addEvent = function(gator, type, callback, handlers) {
-    if (!handlers[gator.id] || !handlers[gator.id][type]) {
+(function (Gator) {
+    var oldAddEvent = Gator.addEvent;
+    Gator.addEvent = function(gator, type, callback) {
         if (gator.element.addEventListener) {
-
-            // blur and focus do not bubble up but if you use event capturing
-            // then you will get them
-            var use_capture = type == 'blur' || type == 'focus';
-            gator.element.addEventListener(type, callback, use_capture);
-            return type;
+            return oldAddEvent(gator, type, callback);
         }
 
         // internet explorer does not support event capturing
@@ -32,37 +28,35 @@ Gator.addEvent = function(gator, type, callback, handlers) {
         }
 
         gator.element.attachEvent('on' + type, callback);
-    }
+    };
 
-    return type;
-};
+    Gator.matchesSelector = function(selector) {
 
-Gator.matchesSelector = function(selector) {
+        // check for class name
+        if (selector.charAt(0) === '.') {
+            return (' ' + this.className + ' ').indexOf(' ' + selector.slice(1) + ' ') > -1;
+        }
 
-    // check for class name
-    if (selector.charAt(0) === '.') {
-        return (' ' + this.className + ' ').indexOf(' ' + selector.slice(1) + ' ') > -1;
-    }
+        // check for id
+        if (selector.charAt(0) === '#') {
+            return this.id === selector.slice(1);
+        }
 
-    // check for id
-    if (selector.charAt(0) === '#') {
-        return this.id === selector.slice(1);
-    }
+        // check for tag
+        return this.tagName === selector.toUpperCase();
+    };
 
-    // check for tag
-    return this.tagName === selector.toUpperCase();
-};
+    Gator.cancel = function(e) {
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
 
-Gator.cancel = function(e) {
-    if (e.preventDefault) {
-        e.preventDefault();
-    }
+        if (e.stopPropagation) {
+            e.stopPropagation();
+        }
 
-    if (e.stopPropagation) {
-        e.stopPropagation();
-    }
-
-    // for IE
-    e.returnValue = false;
-    e.cancelBubble = true;
-};
+        // for IE
+        e.returnValue = false;
+        e.cancelBubble = true;
+    };
+}) (Gator);
