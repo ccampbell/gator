@@ -39,16 +39,12 @@
         _handlers = {},
         _gator_instances = {};
 
-    function _addEvent(gator, type, callback, handlers) {
-        if (!handlers[gator.id] || !handlers[gator.id][type]) {
+    function _addEvent(gator, type, callback) {
 
-            // blur and focus do not bubble up but if you use event capturing
-            // then you will get them
-            var use_capture = type == 'blur' || type == 'focus';
-            gator.element.addEventListener(type, callback, use_capture);
-        }
-
-        return type;
+        // blur and focus do not bubble up but if you use event capturing
+        // then you will get them
+        var use_capture = type == 'blur' || type == 'focus';
+        gator.element.addEventListener(type, callback, use_capture);
     }
 
     function _cancel(e) {
@@ -104,11 +100,11 @@
      * @param {Node} bound_element - the element the listener was attached to
      * @returns {void|Node}
      */
-    function _matches(element, selector, bound_element) {
+    function _matchesSelector(element, selector, bound_element) {
 
         // no selector means this event was bound directly to this element
         if (selector == '_root') {
-            return element;
+            return bound_element;
         }
 
         // if we have moved up to the element you bound the event to
@@ -129,7 +125,7 @@
         // it should still work
         if (element.parentNode) {
             _level++;
-            return _matches(element.parentNode, selector, bound_element);
+            return _matchesSelector(element.parentNode, selector, bound_element);
         }
     }
 
@@ -168,25 +164,25 @@
         }
     }
 
-    function _handleEvent(id, e) {
-        var type = e.type,
-            target = e.target || e.srcElement,
+    function _handleEvent(id, e, type) {
+        if (!_handlers[id][type]) {
+            return;
+        }
+
+        var target = e.target || e.srcElement,
             selector,
             match,
             matches = {},
             i = 0,
             j = 0;
 
-        if (!_handlers[id][type]) {
-            return;
-        }
-
         // find all events that match
         _level = 0;
         for (selector in _handlers[id][type]) {
             if (_handlers[id][type].hasOwnProperty(selector)) {
-                match = _matches(target, selector, _gator_instances[id].element);
-                if (match) {
+                match = _matchesSelector(target, selector, _gator_instances[id].element);
+
+                if (match && Gator.matchesEvent(type, _gator_instances[id].element, match, selector == '_root', e)) {
                     _level++;
                     _handlers[id][type][selector].match = match;
                     matches[_level] = _handlers[id][type][selector];
@@ -237,12 +233,16 @@
 
         var id = this.id,
             global_callback = function(e) {
-                _handleEvent(id, e);
+                _handleEvent(id, e, global_callback.original);
             },
             i;
 
         for (i = 0; i < events.length; i++) {
-            events[i] = Gator.addEvent(this, events[i], global_callback, _handlers);
+            global_callback.original = events[i];
+
+            if (!_handlers[this.id] || !_handlers[this.id][events[i]]) {
+                Gator.addEvent(this, events[i], global_callback);
+            }
 
             if (remove) {
                 _removeHandler(this, events[i], selector, callback);
@@ -313,6 +313,9 @@
     Gator.matchesSelector = function() {};
     Gator.cancel = _cancel;
     Gator.addEvent = _addEvent;
+    Gator.matchesEvent = function() {
+        return true;
+    };
 
     window.Gator = Gator;
 }) ();
