@@ -147,7 +147,7 @@
 
     function _removeHandler(gator, event, selector, callback) {
         if (!callback && !selector) {
-            delete _handlers[gator.id][event];
+            _handlers[gator.id][event] = {};
             return;
         }
 
