@@ -265,7 +265,6 @@
 
         // called as function
         if (!(this instanceof Gator)) {
-
             // only keep one Gator instance per node to make sure that
             // we don't create a ton of new objects if you want to delegate
             // multiple events from the same node
@@ -284,7 +283,7 @@
         }
 
         this.element = element;
-        this.id = _id;
+        this.id = id;
     }
 
     /**
