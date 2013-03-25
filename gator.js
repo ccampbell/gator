@@ -232,16 +232,17 @@
         }
 
         var id = this.id,
-            global_callback = function(e) {
-                _handleEvent(id, e, global_callback.original);
-            },
             i;
 
-        for (i = 0; i < events.length; i++) {
-            global_callback.original = events[i];
+        function _getGlobalCallback(type) {
+            return function(e) {
+                _handleEvent(id, e, type);
+            };
+        }
 
-            if (!_handlers[this.id] || !_handlers[this.id][events[i]]) {
-                Gator.addEvent(this, events[i], global_callback);
+        for (i = 0; i < events.length; i++) {
+            if (!_handlers[id] || !_handlers[id][events[i]]) {
+                Gator.addEvent(this, events[i], _getGlobalCallback(events[i]));
             }
 
             if (remove) {
