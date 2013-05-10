@@ -146,19 +146,25 @@
     }
 
     function _removeHandler(gator, event, selector, callback) {
+        var handlers = (_handlers[gator.id] ? _handlers[gator.id][event] : false);
+
+        if (!handlers) {
+            return;
+        }
+
         if (!callback && !selector) {
             _handlers[gator.id][event] = {};
             return;
         }
 
-        if (!callback) {
-            delete _handlers[gator.id][event][selector];
+        if (!callback && handlers[selector]) {
+            delete handlers[selector];
             return;
         }
 
-        for (var i = 0; i < _handlers[gator.id][event][selector].length; i++) {
-            if (_handlers[gator.id][event][selector][i] === callback) {
-                _handlers[gator.id][event][selector].pop(i, 1);
+        for (var i = 0; i < handlers[selector].length; i++) {
+            if (handlers[selector][i] === callback) {
+                handlers[selector].pop(i, 1);
                 break;
             }
         }
