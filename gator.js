@@ -16,7 +16,7 @@
  * GATOR.JS
  * Simple Event Delegation
  *
- * @version 1.2.0
+ * @version 1.2.1
  *
  * Compatible with IE 9+, FF 3.6+, Safari 5+, Chrome
  *
@@ -156,7 +156,11 @@
         // if there is no event type specified then remove all events
         // example: Gator(element).off()
         if (!event) {
-            _handlers[gator.id] = {};
+            for (var type in _handlers[gator.id]) {
+                if (_handlers[gator.id].hasOwnProperty(type)) {
+                    _handlers[gator.id][type] = {};
+                }
+            }
             return;
         }
 
