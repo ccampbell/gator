@@ -146,16 +146,44 @@
     }
 
     function _removeHandler(gator, event, selector, callback) {
+
+        // if there are no events tied to this element at all
+        // then don't do anything
+        if (!_handlers[gator.id]) {
+            return;
+        }
+
+        // if there is no event type specified then remove all events
+        // example: Gator(element).off()
+        if (!event) {
+            _handlers[gator.id] = {};
+            return;
+        }
+
+        // if no callback or selector is specified remove all events of this type
+        // example: Gator(element).off('click')
         if (!callback && !selector) {
             _handlers[gator.id][event] = {};
             return;
         }
 
+        // if a selector is specified but no callback remove all events
+        // for this selector
+        // example: Gator(element).off('click', '.sub-element')
         if (!callback) {
             delete _handlers[gator.id][event][selector];
             return;
         }
 
+        // if we have specified an event type, selector, and callback then we
+        // need to make sure there are callbacks tied to this selector to
+        // begin with.  if there aren't then we can stop here
+        if (!_handlers[gator.id][event][selector]) {
+            return;
+        }
+
+        // if there are then loop through all the callbacks and if we find
+        // one that matches remove it from the array
         for (var i = 0; i < _handlers[gator.id][event][selector].length; i++) {
             if (_handlers[gator.id][event][selector][i] === callback) {
                 _handlers[gator.id][event][selector].splice(i, 1);
