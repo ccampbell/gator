@@ -241,13 +241,13 @@
         }
 
         for (i = 0; i < events.length; i++) {
-            if (!_handlers[id] || !_handlers[id][events[i]]) {
-                Gator.addEvent(this, events[i], _getGlobalCallback(events[i]));
-            }
-
             if (remove) {
                 _removeHandler(this, events[i], selector, callback);
                 continue;
+            }
+
+            if (!_handlers[id] || !_handlers[id][events[i]]) {
+                Gator.addEvent(this, events[i], _getGlobalCallback(events[i]));
             }
 
             _addHandler(this, events[i], selector, callback);
