@@ -158,7 +158,7 @@
 
         for (var i = 0; i < _handlers[gator.id][event][selector].length; i++) {
             if (_handlers[gator.id][event][selector][i] === callback) {
-                _handlers[gator.id][event][selector].pop(i, 1);
+                _handlers[gator.id][event][selector].splice(i, 1);
                 break;
             }
         }
