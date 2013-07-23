@@ -16,7 +16,7 @@
  * GATOR.JS
  * Simple Event Delegation
  *
- * @version 1.2.1
+ * @version 1.2.2
  *
  * Compatible with IE 9+, FF 3.6+, Safari 5+, Chrome
  *
