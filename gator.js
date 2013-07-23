@@ -254,6 +254,13 @@
      * @returns {Object}
      */
     function _bind(events, selector, callback, remove) {
+
+        // fail silently if you pass null or undefined as an alement
+        // in the Gator constructor
+        if (!this.element) {
+            return;
+        }
+
         if (!(events instanceof Array)) {
             events = [events];
         }
