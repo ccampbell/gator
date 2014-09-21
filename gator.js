@@ -37,14 +37,14 @@
         _level = 0,
         _id = 0,
         _handlers = {},
-        _gator_instances = {};
+        _gatorInstances = {};
 
     function _addEvent(gator, type, callback) {
 
         // blur and focus do not bubble up but if you use event capturing
         // then you will get them
-        var use_capture = type == 'blur' || type == 'focus';
-        gator.element.addEventListener(type, callback, use_capture);
+        var useCapture = type == 'blur' || type == 'focus';
+        gator.element.addEventListener(type, callback, useCapture);
     }
 
     function _cancel(e) {
@@ -97,19 +97,19 @@
      *
      * @param {Node} element - the element to compare against the selector
      * @param {string} selector
-     * @param {Node} bound_element - the element the listener was attached to
+     * @param {Node} boundElement - the element the listener was attached to
      * @returns {void|Node}
      */
-    function _matchesSelector(element, selector, bound_element) {
+    function _matchesSelector(element, selector, boundElement) {
 
         // no selector means this event was bound directly to this element
         if (selector == '_root') {
-            return bound_element;
+            return boundElement;
         }
 
         // if we have moved up to the element you bound the event to
         // then we have come too far
-        if (element === bound_element) {
+        if (element === boundElement) {
             return;
         }
 
@@ -125,7 +125,7 @@
         // it should still work
         if (element.parentNode) {
             _level++;
-            return _matchesSelector(element.parentNode, selector, bound_element);
+            return _matchesSelector(element.parentNode, selector, boundElement);
         }
     }
 
@@ -212,9 +212,9 @@
         _level = 0;
         for (selector in _handlers[id][type]) {
             if (_handlers[id][type].hasOwnProperty(selector)) {
-                match = _matchesSelector(target, selector, _gator_instances[id].element);
+                match = _matchesSelector(target, selector, _gatorInstances[id].element);
 
-                if (match && Gator.matchesEvent(type, _gator_instances[id].element, match, selector == '_root', e)) {
+                if (match && Gator.matchesEvent(type, _gatorInstances[id].element, match, selector == '_root', e)) {
                     _level++;
                     _handlers[id][type][selector].match = match;
                     matches[_level] = _handlers[id][type][selector];
@@ -309,16 +309,16 @@
             // multiple events from the same node
             //
             // for example: Gator(document).on(...
-            for (var key in _gator_instances) {
-                if (_gator_instances[key].element === element) {
-                    return _gator_instances[key];
+            for (var key in _gatorInstances) {
+                if (_gatorInstances[key].element === element) {
+                    return _gatorInstances[key];
                 }
             }
 
             _id++;
-            _gator_instances[_id] = new Gator(element, _id);
+            _gatorInstances[_id] = new Gator(element, _id);
 
-            return _gator_instances[_id];
+            return _gatorInstances[_id];
         }
 
         this.element = element;
