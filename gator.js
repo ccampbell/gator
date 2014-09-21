@@ -65,30 +65,32 @@
 
         if (element.matches) {
             _matcher = element.matches;
+            return _matcher;
         }
 
         if (element.webkitMatchesSelector) {
             _matcher = element.webkitMatchesSelector;
+            return _matcher;
         }
 
         if (element.mozMatchesSelector) {
             _matcher = element.mozMatchesSelector;
+            return _matcher;
         }
 
         if (element.msMatchesSelector) {
             _matcher = element.msMatchesSelector;
+            return _matcher;
         }
 
         if (element.oMatchesSelector) {
             _matcher = element.oMatchesSelector;
+            return _matcher;
         }
 
         // if it doesn't match a native browser method
         // fall back to the gator function
-        if (!_matcher) {
-            _matcher = Gator.matchesSelector;
-        }
-
+        _matcher = Gator.matchesSelector;
         return _matcher;
     }
 
