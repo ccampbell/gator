@@ -1,0 +1,23 @@
+{
+  "name": "gator",
+  "version": "1.2.3",
+  "description": "Event delegation in javascript",
+  "main": "gator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ccampbell/gator.git"
+  },
+  "keywords": [
+    "event",
+    "delegation"
+  ],
+  "author": "Craig Campbell",
+  "license": "Apache 2",
+  "bugs": {
+    "url": "https://github.com/ccampbell/gator/issues"
+  },
+  "homepage": "https://github.com/ccampbell/gator"
+}
