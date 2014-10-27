@@ -302,29 +302,25 @@
      *
      * @param {Node} element
      */
-    function Gator(element, id) {
+    function Gator(element) {
+        // only keep one Gator instance per node to make sure that
+        // we don't create a ton of new objects if you want to delegate
+        // multiple events from the same node
+        //
+        // for example: Gator(document).on(...
+        if (element.__gatorId && _gatorInstances[element.__gatorId]) {
+            return _gatorInstances[element.__gatorId];
+        }
 
-        // called as function
+        // Make sure we are always called with new
         if (!(this instanceof Gator)) {
-            // only keep one Gator instance per node to make sure that
-            // we don't create a ton of new objects if you want to delegate
-            // multiple events from the same node
-            //
-            // for example: Gator(document).on(...
-            for (var key in _gatorInstances) {
-                if (_gatorInstances[key].element === element) {
-                    return _gatorInstances[key];
-                }
-            }
-
-            _id++;
-            _gatorInstances[_id] = new Gator(element, _id);
-
-            return _gatorInstances[_id];
+            return new Gator(element);
         }
 
         this.element = element;
-        this.id = id;
+        this.id = _id++;
+        this.element.__gatorId = this.id;
+        _gatorInstances[this.id] = this;
     }
 
     /**
