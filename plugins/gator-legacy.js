@@ -30,7 +30,7 @@
         gator.element.attachEvent('on' + type, callback);
     };
 
-    Gator.matchesSelector = function(selector) {
+    Gator._matchesSelector = function(selector) {
 
         // check for class name
         if (selector.charAt(0) === '.') {

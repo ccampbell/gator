@@ -90,7 +90,7 @@
 
         // if it doesn't match a native browser method
         // fall back to the gator function
-        _matcher = Gator.matchesSelector;
+        _matcher = Gator._matchesSelector || function() {};
         return _matcher;
     }
 
@@ -116,7 +116,7 @@
         }
 
         // if this is a match then we are done!
-        if (_getMatcher(element).call(element, selector)) {
+        if (Gator.matchesSelector(element, selector)) {
             return element;
         }
 
@@ -351,7 +351,17 @@
         return _bind.call(this, events, selector, callback, true);
     };
 
-    Gator.matchesSelector = function() {};
+    /**
+     * tests a selector against an element
+     *
+     * @param {Node} element
+     * @param {String} selector
+     * @returns {Boolean}
+     */
+    Gator.matchesSelector = function(element, selector) {
+        return _getMatcher(element).call(element, selector);
+    };
+
     Gator.cancel = _cancel;
     Gator.addEvent = _addEvent;
     Gator.matchesEvent = function() {
