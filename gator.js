@@ -32,7 +32,15 @@
  *                            _____..'  .'
  *                           '-._____.-'
  */
-(function() {
+ (function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define([], factory);
+    } else {
+        // Browser globals
+        root.Gator = factory();
+    }
+}(this, function() {
     var _matcher,
         _level = 0,
         _id = 0,
@@ -357,6 +365,5 @@
     Gator.matchesEvent = function() {
         return true;
     };
-
-    window.Gator = Gator;
-}) ();
+    return Gator;
+}));
