@@ -308,7 +308,7 @@
         // multiple events from the same node
         //
         // for example: Gator(document).on(...
-        if (element.__gatorId && _gatorInstances[element.__gatorId]) {
+        if (typeof element.__gatorId !== 'undefined' && _gatorInstances[element.__gatorId]) {
             return _gatorInstances[element.__gatorId];
         }
 
