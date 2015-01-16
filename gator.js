@@ -358,5 +358,8 @@
         return true;
     };
 
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = Gator;
+    }
     window.Gator = Gator;
 }) ();
