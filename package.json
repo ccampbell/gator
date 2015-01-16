@@ -1,6 +1,6 @@
 {
   "name": "gator",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Event delegation in javascript",
   "main": "gator.js",
   "scripts": {
