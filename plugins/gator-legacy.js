@@ -27,8 +27,27 @@
             type = 'focusout';
         }
 
+        if (type == 'change') {
+            gator.element.attachEvent('onfocusin', function(){
+                _legacyAttach(type, window.event.srcElement, callback)
+            });
+        }
+
+        if (type == 'submit') {
+            gator.element.attachEvent('onfocusin', function(){
+                _legacyAttach(type, window.event.srcElement.form, callback)
+            });
+        }
+
         gator.element.attachEvent('on' + type, callback);
     };
+
+    function _legacyAttach(type, element, callback) {
+        if(element && !element.getAttribute('data-gator-attached')) {
+            element.attachEvent('on' + type, callback);
+            element.setAttribute('data-gator-attached','true');
+        }
+    }
 
     Gator.matchesSelector = function(selector) {
 
