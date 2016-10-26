@@ -362,7 +362,7 @@
         module.exports = Gator;
     }
 
-    if(window) {
+    if (window) {
         window.Gator = Gator;
     }
 }) ();
