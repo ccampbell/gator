@@ -6,7 +6,7 @@
   "browser": "gator.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "umd -c Gator $npm_package_main $npm_package_browser"
+    "prepare": "umd -c Gator $npm_package_main | uglifyjs -cmo $npm_package_browser --source-map"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/ccampbell/gator",
   "devDependencies": {
+    "uglify-js": "^3.2.2",
     "umd": "^3.0.1"
   }
 }
