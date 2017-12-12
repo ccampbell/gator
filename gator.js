@@ -184,7 +184,7 @@
         // if we have specified an event type, selector, and callback then we
         // need to make sure there are callbacks tied to this selector to
         // begin with.  if there aren't then we can stop here
-        if (!_handlers[gator.id][event][selector]) {
+        if (!_handlers[gator.id][event] || !_handlers[gator.id][event][selector]) {
             return;
         }
 
